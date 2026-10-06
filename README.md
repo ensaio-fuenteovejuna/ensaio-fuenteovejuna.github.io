@@ -5,7 +5,7 @@ Build estático gerado por `build_web.py` a partir do projeto-fonte no Google Dr
 
 ```bash
 python3 build_web.py          # gera ~/Projects/ensaio-mengo-web/docs
-cd ~/Projects/ensaio-mengo-web && git add -A && git commit -m "Atualiza" && git push
+cd ~/Projects/ensaio-mengo-web && git add -A && git commit -m "Atualiza" && git push   # publica em https://ensaio-fuenteovejuna.github.io/
 ```
 
 - Áudios salvos (ElevenLabs) são servidos como MP3 estáticos; falas sem áudio usam a voz do aparelho.
