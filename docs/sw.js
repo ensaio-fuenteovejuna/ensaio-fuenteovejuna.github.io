@@ -1,4 +1,4 @@
-const CACHE = 'ensaio-5b443d000ff5';
+const CACHE = 'ensaio-d2a96cee3c3a';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png'];
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); });
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(keys =>
