@@ -62,12 +62,9 @@
     .audio-speaking{outline:none;background:var(--surface);border-left-color:var(--text)!important}.focus-wrap.audio-speaking{background:none}.focus-wrap.audio-speaking .speech.focus{box-shadow:0 0 0 4px var(--surface)}
     .audio-speaking:not(.focus-wrap)>.speech-play{background:var(--fill);color:var(--fill-text);border-color:var(--fill)}
     .audio-dock{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;border-radius:999px}.audio-dock[hidden]{display:none}.audio-dock p{flex:1;min-width:0;margin:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:13px;font-weight:500}.audio-dock .roundbtn{width:44px;height:44px}
-    .dock-eq{display:flex;align-items:flex-end;gap:2px;height:14px}.dock-eq i{width:3px;height:30%;background:var(--text);border-radius:2px}body.audio-playing .dock-eq i{animation:eq 900ms ease-in-out infinite alternate}.dock-eq i:nth-child(2){animation-delay:-300ms!important}.dock-eq i:nth-child(3){animation-delay:-600ms!important}@keyframes eq{from{height:20%}to{height:100%}}
-    .mark-badge{display:inline-grid;place-items:center;width:20px;height:20px;margin-left:8px;border-radius:50%;vertical-align:-5px}.mark-badge .ico{width:13px;height:13px;stroke-width:2.4}.mark-badge.sei{background:var(--fill);color:var(--fill-text)}.mark-badge.rever{background:#b4530922;color:#b45309}html.dark .mark-badge.rever{color:#f59e0b}
-    .focus-wrap.is-rever .speech.focus:before{background:#b45309}.toolbtn.on.rever{border-color:#b45309;color:#b45309;background:#b4530912}html.dark .toolbtn.on.rever{border-color:#f59e0b;color:#f59e0b}
-    .line-tools{flex-wrap:wrap}
-    .navrow{--known:0}.navrow:after{content:"";position:absolute;left:0;bottom:0;height:3px;width:calc(var(--known) * 100%);background:var(--fill);transition:width 400ms var(--motion)}
-    #forgetRow[hidden]{display:none}.theme-row+.theme-row{margin-top:0;border-top:0}.known{font-family:var(--mono);font-size:13px;font-weight:600}
+    .dock-eq{display:flex;align-items:flex-end;gap:3px;height:16px}.dock-eq i{width:3px;height:100%;background:var(--text);border-radius:2px;transform-origin:bottom;transform:scaleY(.3);animation:eq 1.2s ease-in-out infinite alternate;animation-play-state:paused}.dock-eq i:nth-child(2){animation-duration:1.4s;animation-delay:-.5s}.dock-eq i:nth-child(3){animation-duration:1.1s;animation-delay:-.9s}body.audio-playing .dock-eq i{animation-play-state:running}@keyframes eq{0%{transform:scaleY(.25)}100%{transform:scaleY(1)}}
+    @media(prefers-reduced-motion:reduce){.dock-eq i{animation:none!important;transform:scaleY(.6)}.dock-eq i:nth-child(2){transform:scaleY(1)}}
+    #forgetRow[hidden]{display:none}.theme-row+.theme-row{margin-top:0;border-top:0}
     .mobile-only,.sheet-head,.backdrop{display:none}
     @media(max-width:760px){
       :root{--top:calc(58px + env(safe-area-inset-top));--side:0px;--study:0px;--safe-b:env(safe-area-inset-bottom)}
@@ -121,8 +118,6 @@
       <div class="modes" role="group" aria-label="Modo de estudo"><button class="mode-btn active" data-mode="read" aria-pressed="true">Leitura</button><button class="mode-btn" data-mode="rehearsal" aria-pressed="false">Ensaio</button></div>
       <p class="rehearsal-help">No Ensaio sua fala fica oculta. Toque ▶ em qualquer fala para ouvir até a sua vez.</p>
       <div class="font-row mobile-only"><div class="theme-copy">Tamanho do texto</div><div><button class="iconbtn" id="minusM" aria-label="Diminuir texto">A−</button> <button class="iconbtn" id="plusM" aria-label="Aumentar texto">A+</button></div></div>
-      <div class="theme-row"><div class="theme-copy">Falas decoradas<small>marque Sei ou Rever ao revelar</small></div><b class="known" id="knownCount">0 de 0</b></div>
-      <div class="theme-row"><div class="theme-copy">Só o que falta<small>anterior/próxima pulam as que você sabe</small></div><button class="theme-switch" id="onlyReview" role="switch" aria-checked="false" aria-label="Navegar só pelas falas que faltam"></button></div>
       <div class="theme-row"><div class="theme-copy">Aparência<small id="themeLabel">Tema claro</small></div><button class="theme-switch" id="themeSwitch" role="switch" aria-checked="false" aria-label="Ativar tema escuro"></button></div>
       <div class="theme-row" id="forgetRow" hidden><div class="theme-copy">Memória do aparelho<small>personagem, ajustes e onde parou</small></div><button class="smallbtn" id="forget">Apagar</button></div>
       <div class="study-card"><span class="label">Deixa atual</span><div class="study-value" id="studyCue">—</div></div>
@@ -144,7 +139,7 @@
   <script>
     const data=JSON.parse(document.getElementById('data').textContent);
     const svg=(d,f)=>`<svg class="ico${f?' fill':''}" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
-    const ICON={play:svg('<path d="M8 5.2v13.6L19 12z"/>',1),pause:svg('<rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/>',1),stop:svg('<rect x="6.5" y="6.5" width="11" height="11" rx="1.5"/>',1),retry:svg('<path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/>'),eye:svg('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),eyeOff:svg('<path d="M3 9.5c2.5 3.6 5.6 5.4 9 5.4s6.5-1.8 9-5.4"/><path d="M5.6 13 4 15.6M9.2 14.6l-.7 2.9M14.8 14.6l.7 2.9M18.4 13l1.6 2.6"/>'),bulb:svg('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.1V16h5v-.1c0-.8.4-1.5 1.1-2.1A6 6 0 0 0 12 3z"/>'),close:svg('<path d="M6 6l12 12M18 6 6 18"/>'),menu:svg('<path d="M4 7h16M4 12h16M4 17h16"/>'),check:svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),flag:svg('<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>')};
+    const ICON={play:svg('<path d="M8 5.2v13.6L19 12z"/>',1),pause:svg('<rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/>',1),stop:svg('<rect x="6.5" y="6.5" width="11" height="11" rx="1.5"/>',1),retry:svg('<path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/>'),eye:svg('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),eyeOff:svg('<path d="M3 9.5c2.5 3.6 5.6 5.4 9 5.4s6.5-1.8 9-5.4"/><path d="M5.6 13 4 15.6M9.2 14.6l-.7 2.9M14.8 14.6l.7 2.9M18.4 13l1.6 2.6"/>'),bulb:svg('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.1V16h5v-.1c0-.8.4-1.5 1.1-2.1A6 6 0 0 0 12 3z"/>'),close:svg('<path d="M6 6l12 12M18 6 6 18"/>'),menu:svg('<path d="M4 7h16M4 12h16M4 17h16"/>')};
     const $=s=>document.querySelector(s),esc=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
     const app=$('#app .reader-inner'),counter=$('#counter'),navpos=$('#navpos'),character=$('#character');
     const state={character:'MENGO',mode:'read',font:18,current:0,activeScene:null,versions:new Map(),hints:new Set(),reveals:new Set(),focus:false,dark:false};
@@ -160,46 +155,38 @@
     const store={get(k){if(!WEB)return null;try{const v=JSON.parse(localStorage.getItem(k));return v&&typeof v==='object'?v:null}catch{return null}},set(k,v){if(!WEB)return;try{localStorage.setItem(k,JSON.stringify(v))}catch{}},del(k){if(!WEB)return;try{localStorage.removeItem(k)}catch{}}};
     const saved=store.get(STATE_KEY)||{};
     state.pos=saved.pos&&typeof saved.pos==='object'?saved.pos:{};
-    state.onlyReview=saved.onlyReview===true;
-    state.marks=store.get(MARK_KEY)||{};
+    store.del(MARK_KEY); // marcações Sei/Rever foram removidas (change ajustes-ensaio-iphone)
     if(characters.includes(saved.character))state.character=saved.character;
     if(['read','rehearsal'].includes(saved.mode))state.mode=saved.mode;
     if(Number.isInteger(saved.font)&&saved.font>=15&&saved.font<=28)state.font=saved.font;
     let restoring=true,posTimer=null,holdScrollSync=0,forgetting=false;
     // A retomada é nossa: o navegador não deve restaurar a rolagem antiga por cima dela.
     if(WEB&&'scrollRestoration' in history)history.scrollRestoration='manual';
-    function persist(){store.set(STATE_KEY,{character:state.character,mode:state.mode,font:state.font,dark:state.dark,onlyReview:state.onlyReview,pos:state.pos})}
+    function persist(){store.set(STATE_KEY,{character:state.character,mode:state.mode,font:state.font,dark:state.dark,pos:state.pos})}
     function savePosition(){clearTimeout(posTimer);posTimer=null;if(restoring||forgetting||!WEB)return;const el=selectedItems()[state.current];if(el){state.pos[state.character]=el.dataset.audioKey;persist()}}
     function rememberPosition(){if(restoring||forgetting||!WEB)return;clearTimeout(posTimer);posTimer=setTimeout(savePosition,1000)}
     // Fechar/trocar de app logo após navegar não pode perder a última fala.
     addEventListener('pagehide',()=>{if(posTimer)savePosition()});document.addEventListener('visibilitychange',()=>{if(document.hidden&&posTimer)savePosition()});
-    const markFor=audioKey=>state.marks[state.character]?.[audioKey]||'';
-    function setMark(audioKey,mark){const m=state.marks[state.character]||(state.marks[state.character]={});if(!mark||m[audioKey]===mark)delete m[audioKey];else m[audioKey]=mark;store.set(MARK_KEY,state.marks)}
-    function knownCount(){const m=state.marks[state.character]||{};return selectedItems().filter(el=>m[el.dataset.audioKey]==='sei').length}
     const keyFor=(scene,itemIndex)=>`${state.character}:${scene.number}:${itemIndex}`;
     const selectedItems=()=>[...document.querySelectorAll('.focus-wrap')];
     const sceneHasCharacter=scene=>scene.items.some(itemMatchesCharacter);
     function shortQuote(text,n=54){const clean=text.replace(/\s+/g,' ').trim();return clean.length>n?clean.slice(0,n).replace(/\s+\S*$/,'')+'…':clean}
     function context(scene,index,direction){for(let i=index+direction;i>=0&&i<scene.items.length;i+=direction){const it=scene.items[i];if(it.type==='speech')return `${it.speaker} — “${shortQuote(it.text)}”`;if(it.type==='stage'&&direction<0)return `AÇÃO — ${shortQuote(it.text)}`}return direction<0?'Início da cena':'Fim da cena'}
-    function hintFor(text){const clean=text.replace(/\([^)]*\)/g,' ').replace(/\s+/g,' ').trim(),words=clean.split(' ').filter(Boolean);if(words.length<=7)return words[0]||'';const sentence=clean.match(/^.+?(?:[!?]+|\.(?=\s|$))/)?.[0];if(sentence&&sentence.split(/\s+/).length<=18)return sentence;const comma=clean.indexOf(',');if(comma>8&&comma<75)return clean.slice(0,comma+1);return words.slice(0,6).join(' ')+'…'}
+    function hintFor(text){const words=text.replace(/\([^)]*\)/g,' ').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);if(words.length===1){const w=words[0].replace(/[^\p{L}\p{N}]+$/u,'');return w.length>2?w.slice(0,2)+'…':w.slice(0,1)+'…'}const n=words.length<=3?1:words.length<=6?2:3;return words.slice(0,n).join(' ')+'…'}
     function versionFor(item,key){if(item.speaker!=='MENGO')return {id:'original',label:'Original',text:item.text};const id=state.versions.get(key)||'original';if(id==='free')return {id,label:'Outra forma',text:item.alternative};if(id==='classic')return {id,label:'Registro clássico',text:item.classic};return {id:'original',label:'Original',text:item.text}}
     function renderFocus(scene,item,itemIndex){const key=keyFor(scene,itemIndex),version=versionFor(item,key),text=version.text,rehearsal=state.mode==='rehearsal',revealed=!rehearsal||state.reveals.has(key),hinted=state.hints.has(key),ann=item.annotation?`, <span class="annotation">${esc(item.annotation)}</span>`:'';
-      const play=rehearsal?`<button class="roundbtn speech-play" data-action="audio-cue" data-scene="${scene.number}" data-index="${itemIndex}" aria-label="Ouvir a deixa" title="Ouvir a deixa">${ICON.play}</button>`:'';
       let body=revealed?`<div class="speechtext">${esc(text)}</div>`:`<button class="hidden-line" data-action="reveal" data-key="${key}" aria-label="Mostrar fala" title="Mostrar fala">${ICON.eyeOff}</button>`;
-      const mark=markFor(`${scene.number}:${itemIndex}`),badge=mark==='sei'?`<span class="mark-badge sei" title="Sei">${ICON.check}</span>`:mark==='rever'?`<span class="mark-badge rever" title="Rever">${ICON.flag}</span>`:'';
-      const marks=rehearsal&&revealed?`<button class="toolbtn${mark==='sei'?' on':''}" data-action="mark" data-mark="sei" data-key="${key}" aria-pressed="${mark==='sei'}" aria-label="Marcar como sei">${ICON.check}<span>Sei</span></button><button class="toolbtn${mark==='rever'?' on rever':''}" data-action="mark" data-mark="rever" data-key="${key}" aria-pressed="${mark==='rever'}" aria-label="Marcar para rever">${ICON.flag}<span>Rever</span></button>`:'';
-      if(rehearsal)body+=`${hinted&&!revealed?`<div class="hint-card">${ICON.bulb}<span>${esc(hintFor(text))}</span></div>`:''}<div class="line-tools"><button class="toolbtn${hinted?' on':''}" data-action="hint" data-key="${key}" aria-pressed="${hinted}" aria-label="${hinted?'Esconder dica':'Dar dica'}">${ICON.bulb}<span>Dica</span></button><button class="toolbtn${revealed?' on':''}" data-action="reveal" data-key="${key}" aria-pressed="${revealed}" aria-label="${revealed?'Esconder fala':'Mostrar fala'}">${revealed?ICON.eyeOff:ICON.eye}<span>${revealed?'Ocultar':'Ver'}</span></button>${marks}</div>`;
+      if(rehearsal)body+=`${hinted&&!revealed?`<div class="hint-card">${ICON.bulb}<span>${esc(hintFor(text))}</span></div>`:''}<div class="line-tools"><button class="toolbtn${hinted?' on':''}" data-action="hint" data-key="${key}" aria-pressed="${hinted}" aria-label="${hinted?'Esconder dica':'Dar dica'}">${ICON.bulb}<span>Dica</span></button><button class="toolbtn${revealed?' on':''}" data-action="reveal" data-key="${key}" aria-pressed="${revealed}" aria-label="${revealed?'Esconder fala':'Mostrar fala'}">${revealed?ICON.eyeOff:ICON.eye}<span>${revealed?'Ocultar':'Ver'}</span></button></div>`;
       body+='<p class="line-audio-status" hidden></p>';
       const variants=item.speaker==='MENGO'&&item.alternative&&item.classic?`<div class="variant-bar"><div class="variant-actions" role="group" aria-label="Versão do texto"><button class="variant-btn ${version.id==='original'?'active':''}" data-action="version" data-version="original" data-key="${key}">Original</button><button class="variant-btn ${version.id==='free'?'active':''}" data-action="version" data-version="free" data-key="${key}">Outra forma</button><button class="variant-btn ${version.id==='classic'?'active':''}" data-action="version" data-version="classic" data-key="${key}">Clássica</button></div></div>`:'';
       const cue=item.cue||context(scene,itemIndex,-1),next=item.next||context(scene,itemIndex,1);
-      return `<div class="focus-wrap${mark?' is-'+mark:''}" data-focus data-audio-key="${scene.number}:${itemIndex}" data-key="${key}" data-scene="${scene.number}" data-cue="${esc(cue)}" data-next="${esc(next)}"><div class="cue"><b>Deixa</b> ${esc(cue)}</div><div class="speech focus"><div class="focus-head"><div class="speaker">${esc(item.speaker)}${ann}${badge}</div>${play}</div>${body}${variants}</div><div class="after"><b>Depois</b> ${esc(next)}</div></div>`}
+      return `<div class="focus-wrap" data-focus data-audio-key="${scene.number}:${itemIndex}" data-key="${key}" data-scene="${scene.number}" data-cue="${esc(cue)}" data-next="${esc(next)}"><div class="cue"><b>Deixa</b> ${esc(cue)}</div><div class="speech focus"><div class="focus-head"><div class="speaker">${esc(item.speaker)}${ann}</div></div>${body}${variants}</div><div class="after"><b>Depois</b> ${esc(next)}</div></div>`}
     function playControl(scene,index){return state.mode==='rehearsal'?`<button class="roundbtn speech-play" data-action="audio-from" data-scene="${scene.number}" data-index="${index}" aria-label="Tocar a partir desta fala de ${esc(scene.items[index].speaker)}" title="Tocar daqui">${ICON.play}</button><p class="line-audio-status" hidden></p>`:''}
-    function render(){let html='';for(const [act,scenes] of Object.entries(data.acts)){html+=`<h1 class="act">ATO ${act}</h1>`;for(const scene of scenes){html+=`<section class="scene" id="scene-${scene.number}" data-scene="${scene.number}" data-title="${esc(scene.title)}"><div class="scenehead"><span class="scene-kicker">CENA ${String(scene.number).padStart(2,'0')}</span><b>${esc(scene.title||'Sem título')}</b>${state.mode==='rehearsal'?`<button class="roundbtn scene-play" data-action="audio-from" data-scene="${scene.number}" data-index="0" aria-label="Tocar a cena ${scene.number} desde o início" title="Tocar a cena">${ICON.play}</button>`:''}</div>`;if(scene.intro)html+=`<div class="sceneintro">${esc(scene.intro)}</div>`;scene.items.forEach((it,index)=>{if(it.type==='stage'){html+=`<div class="stage">${esc(it.text)}</div>`;return}if(itemMatchesCharacter(it)){html+=renderFocus(scene,it,index);return}const ann=it.annotation?`, <span class="annotation">${esc(it.annotation)}</span>`:'';if(it.category==='collective')html+=`<div class="speech collective${state.mode==='rehearsal'?' has-play':''}" data-audio-key="${scene.number}:${index}"><div class="group-label">Você entra junto</div><div class="speaker">${esc(it.speaker)}${ann}</div><div class="speechtext">${esc(it.text)}</div>${playControl(scene,index)}</div>`;else html+=`<div class="speech${state.mode==='rehearsal'?' has-play':''}" data-audio-key="${scene.number}:${index}"><div class="speaker">${esc(it.speaker)}${ann}</div><div class="speechtext">${esc(it.text)}</div>${playControl(scene,index)}</div>`});html+='</section>'}}app.innerHTML=html;buildSceneList();setCurrent(Math.min(state.current,Math.max(0,selectedItems().length-1)),state.activeScene===null);if(state.activeScene!==null)markActiveScene(state.activeScene);updateProgress();window.rehearsalAudio?.sync()}
+    function render(){let html='';for(const [act,scenes] of Object.entries(data.acts)){html+=`<h1 class="act">ATO ${act}</h1>`;for(const scene of scenes){html+=`<section class="scene" id="scene-${scene.number}" data-scene="${scene.number}" data-title="${esc(scene.title)}"><div class="scenehead"><span class="scene-kicker">CENA ${String(scene.number).padStart(2,'0')}</span><b>${esc(scene.title||'Sem título')}</b>${state.mode==='rehearsal'?`<button class="roundbtn scene-play" data-action="audio-from" data-scene="${scene.number}" data-index="0" aria-label="Tocar a cena ${scene.number} desde o início" title="Tocar a cena">${ICON.play}</button>`:''}</div>`;if(scene.intro)html+=`<div class="sceneintro">${esc(scene.intro)}</div>`;scene.items.forEach((it,index)=>{if(it.type==='stage'){html+=`<div class="stage">${esc(it.text)}</div>`;return}if(itemMatchesCharacter(it)){html+=renderFocus(scene,it,index);return}const ann=it.annotation?`, <span class="annotation">${esc(it.annotation)}</span>`:'';if(it.category==='collective')html+=`<div class="speech collective${state.mode==='rehearsal'?' has-play':''}" data-audio-key="${scene.number}:${index}"><div class="group-label">Você entra junto</div><div class="speaker">${esc(it.speaker)}${ann}</div><div class="speechtext">${esc(it.text)}</div>${playControl(scene,index)}</div>`;else html+=`<div class="speech${state.mode==='rehearsal'?' has-play':''}" data-audio-key="${scene.number}:${index}"><div class="speaker">${esc(it.speaker)}${ann}</div><div class="speechtext">${esc(it.text)}</div>${playControl(scene,index)}</div>`});html+='</section>'}}app.innerHTML=html;buildSceneList();setCurrent(Math.min(state.current,Math.max(0,selectedItems().length-1)),state.activeScene===null);if(state.activeScene!==null)markActiveScene(state.activeScene);window.rehearsalAudio?.sync()}
     function markActiveScene(number){state.activeScene=String(number);document.querySelectorAll('.scene-link').forEach(b=>b.classList.toggle('active',b.dataset.scene===state.activeScene))}
-    function setCurrent(i,syncScene=true){const items=selectedItems(),total=items.length;state.current=Math.max(0,Math.min(Math.max(0,total-1),i));counter.textContent=total?`${state.character} · fala ${state.current+1} de ${total}`:`${state.character} · nenhuma fala`;navpos.textContent=total?`${state.current+1} / ${total}`:'0 / 0';navpos.dataset.char=state.character;$('#prev').disabled=!total||(!state.onlyReview&&state.current===0);$('#next').disabled=!total||(!state.onlyReview&&state.current===total-1);$('#progressFill').style.width=total?`${((state.current+1)/total)*100}%`:'0%';const el=items[state.current];$('#studyCue').textContent=el?.dataset.cue||'—';$('#studyNext').textContent=el?.dataset.next||'—';if(syncScene&&el)markActiveScene(el.dataset.scene);rememberPosition()}
-    function updateProgress(){const total=selectedItems().length,known=knownCount();$('#knownCount').textContent=`${known} de ${total}`;document.querySelector('.navrow').style.setProperty('--known',total?known/total:0)}
+    function setCurrent(i,syncScene=true){const items=selectedItems(),total=items.length;state.current=Math.max(0,Math.min(Math.max(0,total-1),i));counter.textContent=total?`${state.character} · fala ${state.current+1} de ${total}`:`${state.character} · nenhuma fala`;navpos.textContent=total?`${state.current+1} / ${total}`:'0 / 0';navpos.dataset.char=state.character;$('#prev').disabled=!total||state.current===0;$('#next').disabled=!total||state.current===total-1;$('#progressFill').style.width=total?`${((state.current+1)/total)*100}%`:'0%';const el=items[state.current];$('#studyCue').textContent=el?.dataset.cue||'—';$('#studyNext').textContent=el?.dataset.next||'—';if(syncScene&&el)markActiveScene(el.dataset.scene);rememberPosition()}
     function jump(delta){window.rehearsalAudio?.stop();const items=selectedItems();if(!items.length)return;let target=Math.max(0,Math.min(items.length-1,state.current+delta));
-      if(state.onlyReview){const open=i=>markFor(items[i].dataset.audioKey)!=='sei';if(!items.some((_,i)=>open(i))){toast('Todas as falas estão decoradas');return}target=state.current;for(let i=state.current+delta;i>=0&&i<items.length;i+=delta)if(open(i)){target=i;break}}if(target===state.current){toast(state.onlyReview?(delta<0?'Nenhuma fala a rever antes desta':'Nenhuma fala a rever depois desta'):target===0?'Você está na primeira fala.':'Você chegou à última fala.');return}const el=items[target],scene=el.closest('.scene');setCurrent(target);window.rehearsalAudio?.resetToSelected();holdScrollSync=performance.now()+600;el.scrollIntoView({behavior:'instant',block:'center'});toast(`Cena ${scene.dataset.scene} · ${scene.dataset.title||'sem título'}`)}
+if(target===state.current){toast(target===0?'Você está na primeira fala.':'Você chegou à última fala.');return}const el=items[target],scene=el.closest('.scene');setCurrent(target);window.rehearsalAudio?.resetToSelected();holdScrollSync=performance.now()+600;el.scrollIntoView({behavior:'instant',block:'center'});toast(`Cena ${scene.dataset.scene} · ${scene.dataset.title||'sem título'}`)}
     function buildSceneList(){const list=$('#sceneList');list.innerHTML='';let count=0;for(const [act,scenes] of Object.entries(data.acts)){const h=document.createElement('h3');h.textContent=`ATO ${act}`;list.appendChild(h);scenes.forEach(scene=>{const has=sceneHasCharacter(scene);if(has)count++;const b=document.createElement('button');b.className='scene-link '+(has?'has':'');b.dataset.scene=scene.number;b.innerHTML=`<span class="num">${String(scene.number).padStart(2,'0')}</span><span>${esc(scene.title||'Sem título')}</span>`;b.onclick=()=>{window.rehearsalAudio?.reset(scene.number);markActiveScene(scene.number);$(`#scene-${scene.number}`).scrollIntoView({behavior:'smooth',block:'start'});const idx=selectedItems().findIndex(x=>x.dataset.scene==scene.number);if(idx>=0)setCurrent(idx,false)};list.appendChild(b)})}$('#sceneCount').textContent=`${count} com falas`}
     function syncModeButtons(){document.querySelectorAll('.mode-btn').forEach(b=>{b.classList.toggle('active',b.dataset.mode===state.mode);b.setAttribute('aria-pressed',String(b.dataset.mode===state.mode))})}
     function setMode(mode){window.rehearsalAudio?.stop();state.mode=mode;persist();state.hints.clear();state.reveals.clear();document.querySelectorAll('.mode-btn').forEach(b=>{b.classList.toggle('active',b.dataset.mode===mode);b.setAttribute('aria-pressed',String(b.dataset.mode===mode))});const anchor=selectedItems()[state.current]?.dataset.key;render();const target=selectedItems().find(el=>el.dataset.key===anchor);target?.scrollIntoView({behavior:'auto',block:'center'})}
@@ -216,7 +203,6 @@
       if(b.dataset.action==='version'){state.versions.set(key,b.dataset.version);state.hints.delete(key);state.reveals.delete(key)}
       if(b.dataset.action==='hint'){state.hints.has(key)?state.hints.delete(key):state.hints.add(key);state.reveals.delete(key)}
       if(b.dataset.action==='reveal'){state.reveals.has(key)?state.reveals.delete(key):state.reveals.add(key)}
-      if(b.dataset.action==='mark'){const ak=focus?.dataset.audioKey;setMark(ak,b.dataset.mark);const now=markFor(ak);setTimeout(()=>{updateProgress();toast(now==='sei'?`Sei · ${knownCount()} de ${selectedItems().length}`:now==='rever'?'Marcada para rever':'Marcação removida')})}
       const top=focus?.getBoundingClientRect().top;render();
       const replacement=selectedItems().find(el=>el.dataset.key===key);
       if(replacement&&top!==undefined)window.scrollBy(0,replacement.getBoundingClientRect().top-top);
@@ -235,8 +221,6 @@
     let scrollTick=false;
     addEventListener('scroll',()=>{if(scrollTick||window.rehearsalAudio?.isActive()||performance.now()<holdScrollSync)return;scrollTick=true;requestAnimationFrame(()=>{scrollTick=false;if(window.rehearsalAudio?.isActive())return;const items=selectedItems();let closest=-1,distance=Infinity;items.forEach((el,i)=>{const rect=el.getBoundingClientRect();if(rect.bottom<72||rect.top>innerHeight)return;const d=Math.abs(rect.top-140);if(d<distance){distance=d;closest=i}});if(closest>=0)setCurrent(closest)})},{passive:true});
     character.value=state.character;syncModeButtons();document.documentElement.style.setProperty('--fs',state.font+'px');if(saved.dark===true){state.dark=true;applyTheme()}
-    $('#onlyReview').setAttribute('aria-checked',String(state.onlyReview));
-    $('#onlyReview').onclick=()=>{state.onlyReview=!state.onlyReview;$('#onlyReview').setAttribute('aria-checked',String(state.onlyReview));persist();setCurrent(state.current,false);toast(state.onlyReview?'Navegando só pelo que falta':'Navegando por todas as falas')};
     if(WEB){$('#forgetRow').hidden=false;$('#forget').onclick=()=>{forgetting=true;clearTimeout(posTimer);store.del(STATE_KEY);scrollTo({top:0,behavior:'instant'});location.reload()}}
     render();
     {const items=selectedItems(),key=state.pos[state.character];let i=key?items.findIndex(el=>el.dataset.audioKey===key):-1;if(key&&i<0){const sc=key.split(':')[0];i=items.findIndex(el=>el.dataset.scene===sc)}
@@ -340,7 +324,8 @@ if (typeof document !== 'undefined') {
   function sync(scroll = false) {
     dock.hidden = status === 'idle';
     document.body.classList.toggle('audio-active', status !== 'idle');
-    document.body.classList.toggle('audio-playing', status === 'playing');
+    // As barras seguem durante o carregamento entre falas (não congelam nem piscam).
+    document.body.classList.toggle('audio-playing', status === 'playing' || status === 'loading');
     $('#audioStatus').textContent = message;
     transport.hidden = ['ended', 'idle'].includes(status);
     transport.disabled = status === 'resuming';
@@ -513,14 +498,14 @@ if (typeof document !== 'undefined') {
 <script>addEventListener("load",()=>{// Guia animado de primeira visita (só na versão web). ~10s, uma vez por aparelho.
 // Requer GSAP; se não carregar (offline), o guia simplesmente não aparece.
 (() => {
-  const KEY = 'ensaio-guia-v1';
+  const KEY = 'ensaio-guia-v2'; // v2: mostra de novo a quem viu a versão que embaçava a tela no iPhone
   try { if (localStorage.getItem(KEY)) return; } catch { return; }
   if (!window.gsap || new URLSearchParams(location.search).has('semguia')) return;
   const seen = () => { try { localStorage.setItem(KEY, '1'); } catch {} };
 
   const css = `
-  .gd{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:16px;background:#0f0f0f8c;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);font-family:var(--sans)}
-  .gd-card{line-height:1.3;width:min(320px,100%);padding:18px 18px 14px;border-radius:22px;background:var(--canvas);color:var(--text);box-shadow:0 20px 60px #0005}
+  .gd{cursor:pointer;position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:16px;background:#0f0f0fa6;font-family:var(--sans)}
+  .gd-card{cursor:default;line-height:1.3;width:min(320px,100%);padding:18px 18px 14px;border-radius:22px;background:var(--canvas);color:var(--text);box-shadow:0 20px 60px #0005}
   .gd-step{display:flex;align-items:center;gap:10px;height:44px;margin-bottom:12px}
   .gd-n{display:grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;background:var(--fill);color:var(--fill-text);font:600 12px var(--mono)}
   .gd-cap{position:relative;flex:1;height:44px}.gd-cap span{position:absolute;inset:0;display:flex;align-items:center;font-size:16px;font-weight:600;line-height:1.2;opacity:0}
@@ -587,19 +572,23 @@ if (typeof document !== 'undefined') {
       .to(dots[i], {width: 18, background: 'var(--fill)', duration: .25}, pos);
   };
   let closed = false;
+  // Nunca prender a tela: some em 12s mesmo se a animação travar, e qualquer erro remove o guia.
   const close = () => {
     if (closed) return; closed = true; seen();
-    gsap.to(root, {autoAlpha: 0, duration: .35, onComplete: () => root.remove()});
+    try { gsap.to(root, {autoAlpha: 0, duration: .3}); } catch {}
+    setTimeout(() => root.remove(), 350);
   };
+  setTimeout(close, 12000);
   q('.gd-skip').onclick = close;
   root.addEventListener('click', e => { if (e.target === root) close(); });
   addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 
-  requestAnimationFrame(() => {
+  requestAnimationFrame(() => { try {
     const m = at(q('.gd-menu')), pick = at(q('.gd-pick')), ens = at(q('.gd-e')), p1 = at(q('.gd-p1'));
     gsap.set(finger, {x: 200, y: 220, autoAlpha: 0});
     const tl = gsap.timeline({onComplete: close});
-    tl.from(q('.gd-card'), {y: 24, autoAlpha: 0, scale: .96, duration: .5, ease: 'power3.out'}, 0);
+    // Cartão visível desde o primeiro quadro (só desliza), sem depender da opacidade animada.
+    tl.from(q('.gd-card'), {y: 18, duration: .5, ease: 'power3.out'}, 0);
     // 1. personagem (0.5–3.6s)
     step(tl, 0, .4);
     tl.to(finger, {autoAlpha: 1, duration: .2}, .7).to(finger, {x: m.x, y: m.y, duration: .7, ease: 'power2.inOut'}, .7);
@@ -628,7 +617,7 @@ if (typeof document !== 'undefined') {
       .to(qa('.gd-eq i'), {height: '100%', duration: .25, stagger: {each: .08, yoyo: true, repeat: 5}, ease: 'sine.inOut'}, 7.7)
       .to(finger, {autoAlpha: 0, duration: .3}, 8.6)
       .to({}, {duration: .1}, 9.5);
-  });
+  } catch (e) { close(); } });
 })();
 
 })</script>
